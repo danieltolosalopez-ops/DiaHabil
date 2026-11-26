@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Día Hábil · ¿Cuándo vence mi plazo?</title>
+  <meta name="description" content="Calcula el último día de un plazo (multas, Hacienda, recursos, juzgados) con los festivos de tu comunidad, y planifica tus puentes.">
+  <meta name="theme-color" content="#1D2433">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="cabecera">
+    <h1 class="marca"><span class="marca-anillas" aria-hidden="true"></span>Día Hábil</h1>
+    <button class="chip-region" id="btn-region" type="button" aria-label="Cambiar comunidad">Elige tu comunidad</button>
+  </header>
+
+  <main>
+    <!-- ===================== PLAZO ===================== -->
+    <section class="vista" id="vista-plazo" aria-labelledby="t-plazo">
+      <h2 id="t-plazo" class="titulo-vista">¿Cuándo vence tu plazo?</h2>
+
+      <form id="form-plazo" class="formulario" novalidate>
+        <label class="campo">
+          <span class="etiqueta">Qué te han notificado</span>
+          <select id="tipo"></select>
+        </label>
+        <p class="ley" id="ley"></p>
+
+        <label class="campo">
+          <span class="etiqueta" id="etq-fecha">Día en que recibiste la notificación</span>
+          <input type="date" id="fecha" required>
+        </label>
+        <label class="casilla">
+          <input type="checkbox" id="electronica">
+          <span>Es una notificación electrónica que no he abierto</span>
+        </label>
+
+        <div class="fila-plazo">
+          <label class="campo campo-num">
+            <span class="etiqueta">Plazo</span>
+            <input type="number" id="cantidad" min="1" max="365" inputmode="numeric" required>
+          </label>
+          <label class="campo">
+            <span class="etiqueta">Cuenta en</span>
+            <select id="unidad">
+              <option value="habiles">días hábiles</option>
+              <option value="naturales">días naturales</option>
+              <option value="meses">meses</option>
+            </select>
+          </label>
+        </div>
+        <label class="campo" id="campo-regimen">
+          <span class="etiqueta">Quién te lo notifica</span>
+          <select id="regimen">
+            <option value="admin">Una administración (Hacienda, DGT, ayuntamiento…)</option>
+            <option value="judicial">Un juzgado o tribunal</option>
+          </select>
+        </label>
+      </form>
+
+      <div id="resultado" class="resultado" aria-live="polite"></div>
+    </section>
+
+    <!-- ===================== MIS PLAZOS ===================== -->
+    <section class="vista" id="vista-mis" hidden aria-labelledby="t-mis">
+      <h2 id="t-mis" class="titulo-vista">Mis plazos</h2>
+      <p class="nota" id="nota-avisos"></p>
+      <ul class="lista-plazos" id="lista-plazos"></ul>
+    </section>
+
+    <!-- ===================== PUENTES ===================== -->
+    <section class="vista" id="vista-puentes" hidden aria-labelledby="t-puentes">
+      <h2 id="t-puentes" class="titulo-vista">Tus puentes</h2>
+      <form class="formulario formulario-linea" id="form-puentes">
+        <label class="campo">
+          <span class="etiqueta">Año</span>
+          <select id="p-año"></select>
+        </label>
+        <label class="campo campo-num">
+          <span class="etiqueta">Días de vacaciones para puentes</span>
+          <input type="number" id="p-dias" min="1" max="40" value="6" inputmode="numeric">
+        </label>
+        <label class="casilla">
+          <input type="checkbox" id="p-sabados">
+          <span>Trabajo los sábados</span>
+        </label>
+      </form>
+      <div id="puentes"></div>
+    </section>
+
+    <!-- ===================== AJUSTES ===================== -->
+    <section class="vista" id="vista-ajustes" hidden aria-labelledby="t-ajustes">
+      <h2 id="t-ajustes" class="titulo-vista">Dónde vives</h2>
+      <form class="formulario" id="form-ajustes">
+        <label class="campo">
+          <span class="etiqueta">Comunidad autónoma</span>
+          <select id="a-region"></select>
+        </label>
+        <label class="campo" id="campo-zona" hidden>
+          <span class="etiqueta" id="etq-zona">Isla</span>
+          <select id="a-zona"></select>
+        </label>
+      </form>
+
+      <h3 class="subtitulo">Fiestas de tu municipio</h3>
+      <p class="nota">Cada pueblo tiene dos fiestas locales al año. Añádelas para que los plazos y los puentes sean exactos. Las publica tu ayuntamiento o el boletín de tu provincia.</p>
+      <ul class="lista-locales" id="lista-locales"></ul>
+      <form class="fila-añadir" id="form-local">
+        <input type="date" id="nueva-local" aria-label="Fecha de la fiesta local" required>
+        <button class="boton boton-secundario" type="submit">Añadir fiesta</button>
+      </form>
+
+      <h3 class="subtitulo">De dónde salen los datos</h3>
+      <p class="nota" id="fuentes"></p>
+      <p class="nota">Día Hábil es una herramienta orientativa y no sustituye el asesoramiento de un profesional. Comprueba siempre el plazo que indica tu notificación. No es una aplicación oficial ni está vinculada a ninguna administración.</p>
+      <p class="nota">Tus datos se guardan solo en este dispositivo. <a href="privacy.html">Política de privacidad</a>.</p>
+    </section>
+  </main>
+
+  <nav class="pestañas" aria-label="Secciones">
+    <button type="button" data-vista="plazo" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Plazo</button>
+    <button type="button" data-vista="mis">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6h13M7 12h13M7 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>Mis plazos</button>
+    <button type="button" data-vista="puentes">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 17h20M4 17v-3a8 8 0 0 1 16 0v3M8 17v-2a4 4 0 0 1 8 0v2"/></svg>Puentes</button>
+    <button type="button" data-vista="ajustes">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Dónde vivo</button>
+  </nav>
+
+  <dialog id="dlg-guardar" class="dialogo">
+    <form method="dialog" id="form-guardar">
+      <h3>Guardar este plazo</h3>
+      <label class="campo">
+        <span class="etiqueta">Nombre para reconocerlo</span>
+        <input type="text" id="g-titulo" maxlength="80" placeholder="Ej.: Multa del radar de la A-2">
+      </label>
+      <p class="nota" id="g-nota"></p>
+      <div class="acciones">
+        <button class="boton boton-secundario" value="cancelar" type="submit" formnovalidate>Cancelar</button>
+        <button class="boton" value="guardar" type="submit">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="aviso-flotante" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

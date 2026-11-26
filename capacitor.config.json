@@ -1,0 +1,11 @@
+{
+  "appId": "io.github.danieltolosalopezops.diahabil",
+  "appName": "Día Hábil",
+  "webDir": "public",
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_aviso",
+      "iconColor": "#D7263D"
+    }
+  }
+}
