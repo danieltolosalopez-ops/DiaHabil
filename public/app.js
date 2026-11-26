@@ -3,7 +3,7 @@ import {
   TIPOS, crearCalendario, calcularPlazo, motivoInhabil, habilesRestantes, buscarPuentes, planDePuentes,
   crearICS, enlaceGoogleCalendar, hoyISO, fechaLarga, nombreMes, diaSemana, diasDelMes, sumarDias, diasEntre,
 } from './core.js';
-import { esNativa, permisoAvisos, programarAvisos, compartirArchivo, abrirFuera, registrarSW } from './native.js';
+import { esNativa, permisoAvisos, programarAvisos, compartirArchivo, abrirFuera, registrarSW, alPulsarAtras, cerrarDialogoAbierto } from './native.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -394,6 +394,12 @@ async function cambiarAjustes() {
 }
 
 // ---------------- Arranque ----------------
+// Botón Atrás de Android: cierra el diálogo abierto o vuelve a la calculadora; en la calculadora, sale.
+alPulsarAtras(() => {
+  if (cerrarDialogoAbierto()) return true;
+  if (document.querySelector('#vista-plazo').hidden) { irA('plazo'); return true; }
+  return false;
+});
 pintarChipRegion();
 aplicarTipo();
 recalcularGuardados();
